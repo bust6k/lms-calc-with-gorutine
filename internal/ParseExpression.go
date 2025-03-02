@@ -1,34 +1,59 @@
 package internal
 
 import (
-	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/http"
 	"project_yandex_lms/structures"
+	"project_yandex_lms/variables"
 	"strconv"
 	"strings"
-	"time"
 )
 
-var TheTasks []structures.Task
-
-func splitAST(node *structures.ASTNode) []string {
+func SplitAST(node *structures.ASTNode) []structures.Task {
 	if node == nil {
 		return nil
 	}
 
-	var subExpressions []string
-	if node.Type == structures.OperatorNode {
-		leftExpr := collectExpression(node.Left)
-		rightExpr := collectExpression(node.Right)
+	var tasks []structures.Task
 
-		subExpressions = append(subExpressions, leftExpr)
-		subExpressions = append(subExpressions, node.Value+" "+rightExpr)
+	if node.Type == structures.OperatorNode {
+		leftTasks := SplitAST(node.Left)
+		tasks = append(tasks, leftTasks...)
+
+		rightTasks := SplitAST(node.Right)
+		tasks = append(tasks, rightTasks...)
+
+		task := structures.Task{
+			Id:        variables.Count_Root_Id,
+			Arg1:      parseOperand(node.Left),
+			Operation: node.Value,
+			Arg2:      parseOperand(node.Right),
+		}
+		tasks = append(tasks, task)
 	}
 
-	return subExpressions
+	return tasks
+}
+func parseOperand(node *structures.ASTNode) float64 {
+	if node.Type == structures.NumberNode {
+		value, _ := strconv.ParseFloat(node.Value, 64)
+		return value
+	} else if node.Type == structures.OperatorNode {
+		left := parseOperand(node.Left)
+		right := parseOperand(node.Right)
+		switch node.Value {
+		case "+":
+			return left + right
+		case "-":
+			return left - right
+		case "*":
+			return left * right
+		case "/":
+			return left / right
+		}
+	}
+	return 0
 }
 
 func collectExpression(node *structures.ASTNode) string {
@@ -38,55 +63,28 @@ func collectExpression(node *structures.ASTNode) string {
 	if node.Type == structures.NumberNode {
 		return node.Value
 	}
+
+	if node.Value == "+" || node.Value == "-" {
+		return "(" + collectExpression(node.Left) + " " + node.Value + " " + collectExpression(node.Right) + ")"
+	}
 	return collectExpression(node.Left) + " " + node.Value + " " + collectExpression(node.Right)
 }
 
-func ParseExpression(tasks []string) error {
-	for i := 0; i < len(tasks); i++ {
-		task := tasks[i]
+func PostExpression(tasks []structures.Task) error {
 
-		if task[0] == '+' {
-			correctTaskPlusAndMinus := fmt.Sprintf("0 + %s", tasks[i])
-			tasks[i] = correctTaskPlusAndMinus
-		} else if task[0] == '-' {
-			correctTaskPlusAndMinus := fmt.Sprintf("0 - %s", tasks[i])
-			tasks[i] = correctTaskPlusAndMinus
-		} else if task[0] == '*' {
-			correctTaskMultiplieAndDivide := fmt.Sprintf("1 * %s", tasks[i])
-			tasks[i] = correctTaskMultiplieAndDivide
-		} else if task[0] == '/' {
-			correctTaskMultiplieAndDivide := fmt.Sprintf("1 / %s", tasks[i])
-			tasks[i] = correctTaskMultiplieAndDivide
-		} else if strings.Contains(task[:len(task)-1], "+ - * /") {
-			return errors.New("ошибка, последний элемент вражения содержит не операнд, а оператор")
-		}
-
-		parsingToTask := func(ex string) structures.Task {
-			ex = strings.ReplaceAll(ex, " ", "")
-			var FloatArg1 float64
-			var FloatArg2 float64
-			var Operator string
-			for i := 0; i < len(ex); i++ {
-				if ex[i] == '+' || ex[i] == '-' || ex[i] == '*' || ex[i] == '/' {
-					FloatArg1, _ = strconv.ParseFloat(ex[:i], 64)
-					Operator = ex[i : i+1]
-					FloatArg2, _ = strconv.ParseFloat(ex[i:], 64)
-
-				}
-			}
-
-			return structures.Task{Id: 3, Arg1: FloatArg1, Arg2: FloatArg2, Operation: Operator, Operation_time: 1 * time.Second}
-		}(tasks[i])
-
-		TheTasks = append(TheTasks, parsingToTask)
-
-	}
-	jsonbytes, err := json.Marshal(TheTasks)
+	bytesjson, err := json.Marshal(tasks)
 	if err != nil {
-		fmt.Errorf("ошибка при сериализации задач в json: %v", err)
+		return err
 	}
-	body := bytes.NewReader(jsonbytes)
-	http.Post("http://localhost:8080/internal", "application/json", body)
 
+	body := strings.NewReader(string(bytesjson))
+	resp, err := http.Post("http://localhost:8080/internal", "application/json", body)
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("ошибка, отправка не является успешной")
+	}
+
+	if err != nil {
+		return err
+	}
 	return nil
 }

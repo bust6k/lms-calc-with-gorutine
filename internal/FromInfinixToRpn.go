@@ -2,22 +2,23 @@ package internal
 
 import (
 	"fmt"
-	"project_yandex_lms/structures"
+	"project_yandex_lms/variables"
 	"strconv"
+	"unicode"
 )
 
-func infixToRPN(expression string) ([]string, error) {
+func InfixToRPN(expression string) ([]string, error) {
 	var output []string
 	var stack []string
 	var currentNum string
 
 	isOperator := func(s string) bool {
-		_, ok := structures.Operators[s]
+		_, ok := variables.Operators[s]
 		return ok
 	}
 
 	precedence := func(op string) int {
-		return structures.Operators[op]
+		return variables.Operators[op]
 	}
 
 	for i, char := range expression {
@@ -31,11 +32,10 @@ func infixToRPN(expression string) ([]string, error) {
 
 			currentNum += token
 
-			if i == len(expression)-1 || !isDigit(rune(expression[i+1])) {
+			if i == len(expression)-1 || !unicode.IsDigit(rune(expression[i+1])) {
 				output = append(output, currentNum)
 				currentNum = ""
 			}
-
 		} else if isOperator(token) {
 
 			for len(stack) > 0 && isOperator(stack[len(stack)-1]) && precedence(token) <= precedence(stack[len(stack)-1]) {
@@ -46,6 +46,7 @@ func infixToRPN(expression string) ([]string, error) {
 		} else if token == "(" {
 			stack = append(stack, token)
 		} else if token == ")" {
+
 			for len(stack) > 0 && stack[len(stack)-1] != "(" {
 				output = append(output, stack[len(stack)-1])
 				stack = stack[:len(stack)-1]
@@ -68,9 +69,4 @@ func infixToRPN(expression string) ([]string, error) {
 	}
 
 	return output, nil
-}
-
-func isDigit(r rune) bool {
-	_, err := strconv.Atoi(string(r))
-	return err == nil
 }

@@ -1,10 +1,12 @@
 package structures
 
-import "time"
+import (
+	"time"
+)
 
 type RootExpression struct {
-	Id         int    `json:"id"`
-	Expression string `json:"expression"`
+	Id         int    `json:"id,omitempty"`
+	Expression string `json:"expression,omitempty" `
 }
 
 type NodeType int
@@ -21,13 +23,6 @@ type ASTNode struct {
 	Right *ASTNode
 }
 
-var Operators = map[string]int{
-	"+": 1,
-	"-": 1,
-	"*": 2,
-	"/": 2,
-}
-
 type Task struct {
 	Id             int           `json:"id"`
 	Arg1           float64       `json:"arg1"`
@@ -41,5 +36,3 @@ type Expression struct {
 	Status string  `json:"status"`
 	Result float64 `json:"result"`
 }
-
-var Expressions []Expression

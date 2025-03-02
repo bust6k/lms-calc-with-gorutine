@@ -5,12 +5,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"project_yandex_lms/internal"
+
+	"project_yandex_lms/structures"
 	"project_yandex_lms/variables"
 )
 
 func PostTaskToServer(result float64) error {
-	var expression internal.Expression
+	var expression structures.Expression
 	expression.Id = variables.Count_Root_Id
 	expression.Status = "ready"
 	expression.Result = result
