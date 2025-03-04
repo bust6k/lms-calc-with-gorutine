@@ -5,7 +5,7 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
-	"project_yandex_lms/internal"
+	"project_yandex_lms/important"
 	"project_yandex_lms/structures"
 	"project_yandex_lms/variables"
 	"strings"
@@ -19,7 +19,7 @@ func TestCreateRootExpressionHandlerBadCase(t *testing.T) {
 	}
 	req := httptest.NewRequest("POST", "http://localhost:8080/api/v1/calculate", strings.NewReader(string(bytesresp)))
 	w := httptest.NewRecorder()
-	internal.CreateRootExpressionHandler(w, req)
+	important.CreateRootExpressionHandler(w, req)
 	resp := w.Result()
 	if resp.StatusCode != http.StatusBadRequest {
 		t.Error("ожидаемый статус код не соответствует результатуеее")
@@ -33,7 +33,7 @@ func TestCreateRootExpressionHandlerGoodCase(t *testing.T) {
 	}
 	req := httptest.NewRequest("POST", "http://localhost:8080/api/v1/calculate", strings.NewReader(string(bytesresp)))
 	w := httptest.NewRecorder()
-	internal.CreateRootExpressionHandler(w, req)
+	important.CreateRootExpressionHandler(w, req)
 	resp := w.Result()
 	bytesBody, err := io.ReadAll(resp.Body)
 	if err != nil {

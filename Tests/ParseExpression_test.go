@@ -1,7 +1,7 @@
 package Tests
 
 import (
-	"project_yandex_lms/internal"
+	"project_yandex_lms/important"
 	"project_yandex_lms/structures"
 	"project_yandex_lms/variables"
 	"reflect"
@@ -18,7 +18,7 @@ func TestSplitAST(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		result := internal.SplitAST(test.node)
+		result := important.SplitAST(test.node)
 		if !reflect.DeepEqual(result, test.expected) {
 			t.Errorf("Результат не совпадает для AST %v: ожидалось %v, получено %v", test.node, test.expected, result)
 		}

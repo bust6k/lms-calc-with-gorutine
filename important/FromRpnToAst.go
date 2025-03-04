@@ -1,4 +1,4 @@
-package internal
+package important
 
 import (
 	"fmt"

@@ -2,7 +2,7 @@ package Tests
 
 import (
 	"fmt"
-	"project_yandex_lms/internal"
+	"project_yandex_lms/important"
 	"project_yandex_lms/structures"
 	"reflect"
 	"testing"
@@ -30,7 +30,7 @@ func TestBuildAST(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		result, err := internal.BuildAST(test.rpn)
+		result, err := important.BuildAST(test.rpn)
 		if err != nil && err.Error() != test.err.Error() {
 			t.Errorf("Ошибка не совпадает для RPN %v: ожидалось %v, получено %v", test.rpn, test.err, err)
 		}

@@ -2,7 +2,7 @@ package Tests
 
 import (
 	"fmt"
-	"project_yandex_lms/internal"
+	"project_yandex_lms/important"
 	"reflect"
 
 	"testing"
@@ -22,7 +22,7 @@ func TestInfixToRPN(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		result, err := internal.InfixToRPN(test.expression)
+		result, err := important.InfixToRPN(test.expression)
 		if err != nil && err.Error() != test.err.Error() {
 			t.Errorf("Ошибка не совпадает для выражения %s: ожидалось %v, получено %v", test.expression, test.err, err)
 		}
