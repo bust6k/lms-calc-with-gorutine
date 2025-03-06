@@ -74,7 +74,7 @@
 ## Как запустить проект
 
 для копирования репозитория к вам используйте команду
-```git clone https://github.com/bust6k/calc-yandex-lms-version-2.0.git```
+```git clone https://github.com/bust6k/lms-calc-with-gorutine.git```
 
 или если у вас не получается используйте команду
 
