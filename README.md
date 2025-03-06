@@ -78,7 +78,7 @@
 
 или если у вас не получается используйте команду
 
-```git clone git@github.com:bust6k/calc-yandex-lms-version-2.0.git```
+```git clone git@github.com:bust6k/lms-calc-with-gorutine.git```
 
 
 для того чтобы запустить сам сервер введите команду ```go run .```
